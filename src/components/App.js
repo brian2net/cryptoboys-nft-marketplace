@@ -108,7 +108,9 @@ class App extends Component {
       this.setState({ accountBalance });
       this.setState({ loading: false });
       const networkId = await web3.eth.net.getId();
+      console.log(networkId);
       const networkData = CryptoBoys.networks[networkId];
+      console.log(CryptoBoys.networks);
       if (networkData) {
         this.setState({ loading: true });
         const cryptoBoysContract = web3.eth.Contract(
@@ -132,13 +134,22 @@ class App extends Component {
         let totalTokensMinted = await cryptoBoysContract.methods
           .getNumberOfTokensMinted()
           .call();
-        totalTokensMinted = totalTokensMinted.toNumber();
-        this.setState({ totalTokensMinted });
+
+          if (totalTokensMinted) {
+            totalTokensMinted = totalTokensMinted.toNumber();
+            this.setState({ totalTokensMinted });
+          } else {
+            totalTokensMinted = 0;
+          }
         let totalTokensOwnedByAccount = await cryptoBoysContract.methods
           .getTotalNumberOfTokensOwnedByAnAddress(this.state.accountAddress)
           .call();
-        totalTokensOwnedByAccount = totalTokensOwnedByAccount.toNumber();
-        this.setState({ totalTokensOwnedByAccount });
+          if (totalTokensOwnedByAccount) {
+            totalTokensOwnedByAccount = totalTokensOwnedByAccount.toNumber();
+            this.setState({ totalTokensOwnedByAccount });
+          } else {
+            totalTokensOwnedByAccount = 0;
+          }
         this.setState({ loading: false });
       } else {
         this.setState({ contractDetected: false });
@@ -208,11 +219,13 @@ class App extends Component {
         bodyBackgroundColor,
         bodyBorderColor,
       } = colors;
-      let previousTokenId;
+      let previousTokenId = 0;
       previousTokenId = await this.state.cryptoBoysContract.methods
         .cryptoBoyCounter()
         .call();
-      previousTokenId = previousTokenId.toNumber();
+        if (previousTokenId) {
+          previousTokenId = previousTokenId.toNumber();
+        }
       const tokenId = previousTokenId + 1;
       const tokenObject = {
         tokenName: "Crypto Boy",
